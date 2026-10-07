@@ -1,0 +1,15 @@
+MERIDIAN DEEP-SPACE DOWNLINK — FRAME FORMAT (1977 spec sheet)
+================================================================
+frame = ASM(4) | FCNT(2) | scrambled( FILL(16) | payload(100) )   [sizes in bytes]
+
+  ASM       attached sync marker, 4 bytes
+  FCNT      frame counter, 2 bytes big-endian; increments once per frame from power-on (frame 0 = boot)
+  FILL      energy-dispersal pattern, 16 bytes, at the head of every frame body (spectral shaping / DC balance). 
+            FIXED: 55555555555555555555555555555555 (a constant 0x55 pattern)
+  payload   100 bytes
+
+SCRAMBLER
+  The FILL field and the payload are XORed with the output of a 32-bit Fibonacci LFSR.
+  The register is loaded ONCE at power-on with the station master clock and then runs
+  continuously: frame c's scrambled region begins at keystream byte offset c*116.
+  The generator polynomial (feedback taps) should NEVER be published.
